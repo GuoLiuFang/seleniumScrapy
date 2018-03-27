@@ -8,7 +8,7 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
-
+FEED_EXPORT_ENCODING = 'utf-8'
 BOT_NAME = 'firstVersion'
 
 SPIDER_MODULES = ['firstVersion.spiders']
