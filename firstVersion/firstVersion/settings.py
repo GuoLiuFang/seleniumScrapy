@@ -79,6 +79,7 @@ ROBOTSTXT_OBEY = True
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Enable showing throttling stats for every response received:
+DUPEFILTER_DEBUG = True
 #AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
