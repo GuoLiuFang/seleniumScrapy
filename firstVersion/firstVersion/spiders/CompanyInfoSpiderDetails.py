@@ -24,11 +24,11 @@ class CompanyInfoSpiderDetails(scrapy.Spider):
         self.log('当前处理的 URL 是%s' % response.url)
         yield {
                 'tag':getattr(self, 'tag', None),
-                'company_name':re.sub('[\r\n \t]+','',response.css("div.in h1::attr(title)").extract_first().replace(u'\xa0','') if response.css("div.in h1::attr(title)").extract_first() is not None else ''),
-                'company_property':re.sub('[\r\n \t]+','',response.css("div.in p.ltype::text").extract_first().replace(u'\xa0','') if response.css("div.in p.ltype::text").extract_first() is not None else ''),
-                'company_selfintro':re.sub('[\r\n \t]+','',response.css("div.con_txt::text").extract_first().replace(u'\xa0','') if response.css("div.con_txt::text").extract_first() is not None else ''),
-                'company_address_label':re.sub('[\r\n \t]+','',response.css('p.fp span.label::text').extract_first().replace(u'\xa0','') if response.css('p.fp span.label::text').extract_first() is not None else ''),
-                'company_address_details':re.sub('[\r\n \t]+','',''.join(str(e) for e in response.css('p.fp::text').extract()).replace(u'\xa0','') if response.css('p.fp::text').extract() is not None else ''),
-                'company_website_label':re.sub('[\r\n \t]+','',response.css('p.fp.tmsg span.label::text').extract_first().replace(u'\xa0','') if response.css('p.fp.tmsg span.label::text').extract_first() is not None else ''),
-                'company_website_detials':re.sub('[\r\n \t]+','',response.css('p.fp.tmsg a::attr(href)').extract_first().replace(u'\xa0','') if response.css('p.fp.tmsg a::attr(href)').extract_first() is not None else ''),
+                'company_name':re.sub('[\r\n \t]+','',response.css("div.in h1::attr(title)").extract_first().replace(u'\xa0','').replace('"','”') if response.css("div.in h1::attr(title)").extract_first() is not None else ''),
+                'company_property':re.sub('[\r\n \t]+','',response.css("div.in p.ltype::text").extract_first().replace(u'\xa0','').replace('"','”') if response.css("div.in p.ltype::text").extract_first() is not None else ''),
+                'company_selfintro':re.sub('[\r\n \t]+','',response.css("div.con_txt::text").extract_first().replace(u'\xa0','').replace('"','”') if response.css("div.con_txt::text").extract_first() is not None else ''),
+                'company_address_label':re.sub('[\r\n \t]+','',response.css('p.fp span.label::text').extract_first().replace(u'\xa0','').replace('"','”') if response.css('p.fp span.label::text').extract_first() is not None else ''),
+                'company_address_details':re.sub('[\r\n \t]+','',''.join(str(e) for e in response.css('p.fp::text').extract()).replace(u'\xa0','').replace('"','”') if response.css('p.fp::text').extract() is not None else ''),
+                'company_website_label':re.sub('[\r\n \t]+','',response.css('p.fp.tmsg span.label::text').extract_first().replace(u'\xa0','').replace('"','”') if response.css('p.fp.tmsg span.label::text').extract_first() is not None else ''),
+                'company_website_detials':re.sub('[\r\n \t]+','',response.css('p.fp.tmsg a::attr(href)').extract_first().replace(u'\xa0','').replace('"','”') if response.css('p.fp.tmsg a::attr(href)').extract_first() is not None else ''),
         }
