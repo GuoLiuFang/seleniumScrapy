@@ -76,8 +76,10 @@ class CompanyInfoSpider(scrapy.Spider):
                 next_page = next_page_list[0]
             else:
                 next_page = None
-        else:
+        else if whichpage > 1:
             next_page = next_page_list[1]
+        else:
+            next_page = None
         if next_page is not None:
             self.page = self.page + 1
             next_page = "http:" + next_page
