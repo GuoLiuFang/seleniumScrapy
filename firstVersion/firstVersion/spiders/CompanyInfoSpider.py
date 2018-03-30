@@ -74,11 +74,14 @@ class CompanyInfoSpider(scrapy.Spider):
         if whichpage == 1:
             if self.page == 1:
                 next_page = next_page_list[0]
+                print("这个页面%s，是结束页" % response.url)
             else:
                 next_page = None
+                print("这个页面%s，是开始页" % response.url)
         elif whichpage > 1:
             next_page = next_page_list[1]
         else:
+            print("这个页面%s，上一页和下一页按钮不可用" % response.url)
             next_page = None
         if next_page is not None:
             self.page = self.page + 1
