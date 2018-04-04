@@ -24,11 +24,14 @@ class CompanyInfoSpiderDetails(scrapy.Spider):
             os._exit(0)
         #filename = '51job-%s.log' % tag
         filename = '51job-%s-%s.log' % (tag, whichplace)
-        with open(filename, 'r') as f:
-            for line in f:
-                url = "http://" + line
-                print("读取文件获取链接%s" % url)
-                yield scrapy.Request(url, self.parse)
+        if os.path.isfile(filename):
+            with open(filename, 'r') as f:
+                for line in f:
+                    url = "http://" + line
+                    print("读取文件获取链接%s" % url)
+                    yield scrapy.Request(url, self.parse)
+        else:
+            print("文件%s 不存在！" % filename)
     def parse(self, response):
         print('当前处理的 URL 是%s' % response.url)
         self.log('当前处理的 URL 是%s' % response.url)
