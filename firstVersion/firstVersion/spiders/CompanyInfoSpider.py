@@ -66,7 +66,7 @@ class CompanyInfoSpider(scrapy.Spider):
             #        'companyurl' : page
             #}
             filename = '51job-%s-%s.log' % (tag, whichplace)
-            with open(filename, 'a+') as f:
+            with os.open(filename, 'a+', encoding='utf8') as f:
                 f.write(page + '\n')
         next_page_list = response.css("li.bk a::attr(href)").extract()
         #这个网站永远不会有 None的，如果用 css 来进行提取的话
