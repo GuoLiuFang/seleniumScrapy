@@ -1,3 +1,4 @@
+import io
 import sys
 import os
 sys.path.append(os.getcwd())
@@ -43,6 +44,7 @@ class CompanyInfoSpider(scrapy.Spider):
         sureadd = driver.find_element_by_css_selector('span#work_position_click_bottom_save.p_but')
         sureadd.click()
         #输入搜索的专业内容
+        #1.全部取消表示“全国”;2.driver.execute_script("document.getElementById('work_position_input').value = '全国'")执行 javascript 代码。。
         elem = driver.find_element_by_id("kwdselectid")
         elem.clear()
         elem.send_keys(tag)
@@ -60,13 +62,14 @@ class CompanyInfoSpider(scrapy.Spider):
         whichplace = getattr(self, 'place', None)
         print('当前是第%d 页' % self.page)
         print('爬取的网页 URL 是%s' % response.url)
-        for i in response.css("span.t2 a::attr(href)").extract():
-            page = i.split("//")[-1]
-            #yield {
-            #        'companyurl' : page
-            #}
-            filename = '51job-%s-%s.log' % (tag, whichplace)
-            with os.open(filename, 'a+', encoding='utf8') as f:
+        filename = '51job-%s-%s.log' % (tag, whichplace)
+        with io.open(filename, 'a+', encoding='utf8') as f:
+            f.write("草泥马")
+            for i in response.css("span.t2 a::attr(href)").extract():
+                page = i.split("//")[-1]
+                #yield {
+                #        'companyurl' : page
+                #}
                 f.write(page + '\n')
         next_page_list = response.css("li.bk a::attr(href)").extract()
         #这个网站永远不会有 None的，如果用 css 来进行提取的话
