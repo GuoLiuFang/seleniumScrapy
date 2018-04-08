@@ -64,7 +64,7 @@ class CompanyInfoSpider(scrapy.Spider):
         print('爬取的网页 URL 是%s' % response.url)
         filename = '51job-%s-%s.log' % (tag, whichplace)
         with io.open(filename, 'a+', encoding='utf8') as f:
-            f.write("草泥马")
+            #f.write("草泥马")
             for i in response.css("span.t2 a::attr(href)").extract():
                 page = i.split("//")[-1]
                 #yield {
