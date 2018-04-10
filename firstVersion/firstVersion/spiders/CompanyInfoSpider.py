@@ -9,6 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import scrapy
+#增加在 Windows 下输出信息中文乱码问题
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 class CompanyInfoSpider(scrapy.Spider):
     name = "scrape51job"
     page = 1
@@ -26,33 +28,36 @@ class CompanyInfoSpider(scrapy.Spider):
         if provincekey is None and citykey is None:
             print("请输入一下省份或者城市信息  '广东省' '江苏省' '浙江省' '四川省' '海南省' '福建省' '山东省' '江西省' '广西' '安徽省' '河北省' '河南省' '湖北省' '湖南省' '陕西省' '山西省' '黑龙江省' '辽宁省' '吉林省' '云南省' '贵州省' '甘肃省' '内蒙古' '宁夏' '西藏' '新疆' '青海省' '香港' '澳门' '台湾' '北京' '上海' '广州' '深圳' '武汉' '西安' '杭州' '南京' '成都' '重庆' '东莞' '大连' '沈阳' '苏州' '昆明' '长沙' '合肥' '宁波' '郑州' '天津' '青岛' '济南' '哈尔滨' '长春' '福州'   ") 
             os._exit(0)
-        #先选择地区，搞错了抱歉
-        addbut = driver.find_element_by_css_selector('p#work_position_click.addbut')
-        addbut.click()
-        #取消地区选项
-        cancelCity = driver.find_element_by_css_selector('span#work_position_click_multiple_selected_each_010000.ttag')
-        cancelCity.click()
+        ##先选择地区，搞错了抱歉
+        #addbut = driver.find_element_by_css_selector('p#work_position_click.addbut')
+        #addbut.click()
+        ##取消地区选项
+        #cancelCity = driver.find_element_by_css_selector('span#work_position_click_multiple_selected_each_010000.ttag')
+        #cancelCity.click()
         placekey = citykey
         if provincekey is not None:
             placekey = provincekey
-            eleprovince = driver.find_element_by_css_selector('li#work_position_click_center_left_each_030000')
-            eleprovince.click()
-        #勾选参数选定的地区
-        addCity = driver.find_element_by_css_selector(placekey)
-        addCity.click()
-        #点击确定键
-        sureadd = driver.find_element_by_css_selector('span#work_position_click_bottom_save.p_but')
-        sureadd.click()
+        #    eleprovince = driver.find_element_by_css_selector('li#work_position_click_center_left_each_030000')
+        #    eleprovince.click()
+        ##勾选参数选定的地区
+        #addCity = driver.find_element_by_css_selector(placekey)
+        #addCity.click()
+        ##点击确定键
+        #sureadd = driver.find_element_by_css_selector('span#work_position_click_bottom_save.p_but')
+        #sureadd.click()
         #输入搜索的专业内容
         #1.全部取消表示“全国”;2.driver.execute_script("document.getElementById('work_position_input').value = '全国'")执行 javascript 代码。。
+        driver.execute_script("document.getElementById('jobarea').value = '%s'" % placekey)
         elem = driver.find_element_by_id("kwdselectid")
         elem.clear()
         elem.send_keys(tag)
         elem.send_keys(Keys.RETURN)
         try:
             WebDriverWait(driver, 10).until(EC.title_contains(tag))
-        finally:
+        except Exception:
             print("页面没有加载完成，超时了")
+        finally:
+            print("页面等待 finally")
         url = driver.current_url
         print('动态生成的网页 URL 是%s' % url)
         driver.close()
