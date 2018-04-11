@@ -66,7 +66,7 @@ connection = pymysql.connect(host='localhost',port=13306,user='webuser',password
 PROXIES = []
 try:
     with connection.cursor() as cursor:
-        sql = "select * from `anonymous_proxy` limit 10"
+        sql = "select * from `anonymous_proxy` where net_speed < 1 and connect_speed < 1"
         cursor.execute(sql)
         result = cursor.fetchall()
         for i in result:

@@ -17,6 +17,8 @@ class MyCustomDownloaderMiddleware(object):
     # 在这里完成代理的事情。。每一个 request 重新非一个代理。。
     def process_request(self, request, spider):
         #通过setting获取 MySQL，因为 setting 只被执行一次。。
+        #proxy = "http://220.184.33.129:9000"
+        #proxy = "https://218.72.111.103:18118"
         proxy = random.choice(PROXIES)
         print("本次请求%s的代理 ip 地址为%s" % (request,proxy))
         request.meta['proxy'] = proxy
