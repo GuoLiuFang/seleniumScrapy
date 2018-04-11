@@ -6,6 +6,22 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import sys
+sys.path.append("/Users/LiuFangGuo/Documents/CrawlerWorkSpace/51job/firstVersion/firstVersion/")
+from settings import PROXIES
+import random
+class MyCustomDownloaderMiddleware(object):
+    #@classmethod
+    #def from_crawler(cls, crawler):
+
+    # 在这里完成代理的事情。。每一个 request 重新非一个代理。。
+    def process_request(self, request, spider):
+        #通过setting获取 MySQL，因为 setting 只被执行一次。。
+        proxy = random.choice(PROXIES)
+        print("本次请求%s的代理 ip 地址为%s" % (request,proxy))
+        request.meta['proxy'] = proxy
+
+
 
 
 class FirstversionSpiderMiddleware(object):

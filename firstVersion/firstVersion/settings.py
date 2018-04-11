@@ -53,10 +53,35 @@ ROBOTSTXT_OBEY = False
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'firstVersion.middlewares.MyCustomDownloaderMiddleware': 543,
-#}
-
+DOWNLOADER_MIDDLEWARES = {
+    'firstVersion.middlewares.MyCustomDownloaderMiddleware': 543,
+}
+#在这里设置 userAgent 和 proxy,在这里进行全量加载
+#ssh -L 13306:10.127.84.14:13306 ws1
+import pymysql
+import os
+import sys
+sys.path.append(os.getcwd())
+connection = pymysql.connect(host='localhost',port=13306,user='webuser',password='123.c0m',db='lk',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+PROXIES = []
+try:
+    with connection.cursor() as cursor:
+        sql = "select * from `anonymous_proxy` limit 10"
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        for i in result:
+            # to_list.append(str(i['email']))
+            # print("ip----%s" % i['ip'])
+            # print("port----%d" % i['port'])
+            # print("type----%s" % i['type'])
+            # print("location----%s" % i['location'])
+            # print("verify_time----%s" % i['verify_time'])
+            # print(i['type'].lower()+"://" + i['ip'] + ":" + str(i['port']))
+            PROXIES.append(i['type'].lower()+"://" + i['ip'] + ":" + str(i['port']))
+except:
+    print("获取数据出现异常")
+    sys.exit(0)
+    os._exit(0)
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
