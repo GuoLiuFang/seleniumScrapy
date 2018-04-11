@@ -12,6 +12,7 @@ import scrapy
 #增加在 Windows 下输出信息中文乱码问题
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 #因为 scrapy 禁止抓取所以使用 selenium 进行抓取
+# 这个数据可以每天 truncate 导入。。
 driver = webdriver.Firefox()
 start_urls = "http://www.xicidaili.com/nn/"
 filename=sys.argv[0]
@@ -27,11 +28,14 @@ with io.open(filename, 'a+', encoding='utf8') as f:
         # 开始对每一页开始处理
         for z in driver.find_elements_by_css_selector("table#ip_list tbody tr.odd"):
             y = z.find_elements_by_css_selector("td")
+            v = z.find_elements_by_css_selector("td.country div.bar")
             w = []
             w.append(y[1].text)
             w.append(y[2].text)
             w.append(y[5].text)
             w.append(y[3].text)
+            w.append(v[0].get_attribute('title').replace("秒",""))
+            w.append(v[1].get_attribute('title').replace("秒",""))
             w.append(y[9].text)
             f.write(sep.join(w) + "\n")
             f.flush()

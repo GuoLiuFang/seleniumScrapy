@@ -31,6 +31,8 @@ with io.open(filename, 'a+', encoding='utf8') as f:
             w.append(tds[1].text)
             w.append(tds[3].text)
             w.append(tds[4].text)
+            w.append(tds[5].text.replace("秒",""))
+            w.append("0.9"))
             w.append(tds[6].text)
             f.write(sep.join(w) + "\n")
             f.flush()
