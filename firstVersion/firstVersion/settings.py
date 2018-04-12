@@ -24,14 +24,17 @@ ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 3
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 #DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
+CONCURRENT_REQUESTS_PER_IP = 3
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -58,30 +61,6 @@ DOWNLOADER_MIDDLEWARES = {
 }
 #在这里设置 userAgent 和 proxy,在这里进行全量加载
 #ssh -L 13306:10.127.84.14:13306 ws1
-import pymysql
-import os
-import sys
-sys.path.append(os.getcwd())
-connection = pymysql.connect(host='localhost',port=13306,user='webuser',password='123.c0m',db='lk',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
-PROXIES = []
-try:
-    with connection.cursor() as cursor:
-        sql = "select * from `anonymous_proxy` where net_speed < 1 and connect_speed < 1"
-        cursor.execute(sql)
-        result = cursor.fetchall()
-        for i in result:
-            # to_list.append(str(i['email']))
-            # print("ip----%s" % i['ip'])
-            # print("port----%d" % i['port'])
-            # print("type----%s" % i['type'])
-            # print("location----%s" % i['location'])
-            # print("verify_time----%s" % i['verify_time'])
-            # print(i['type'].lower()+"://" + i['ip'] + ":" + str(i['port']))
-            PROXIES.append(i['type'].lower()+"://" + i['ip'] + ":" + str(i['port']))
-except:
-    print("获取数据出现异常")
-    sys.exit(0)
-    os._exit(0)
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {

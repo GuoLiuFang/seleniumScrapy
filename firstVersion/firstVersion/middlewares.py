@@ -6,9 +6,31 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-import sys
-sys.path.append("/Users/LiuFangGuo/Documents/CrawlerWorkSpace/51job/firstVersion/firstVersion/")
-from settings import PROXIES
+#import pymysql
+#import os
+#import io
+#import sys
+#connection = pymysql.connect(host='localhost',port=13306,user='webuser',password='123.c0m',db='lk',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+PROXIES = []
+#current_ip = ''
+#try:
+#    with connection.cursor() as cursor:
+#        sql = "select * from `anonymous_proxy` where net_speed < 1 and connect_speed < 1"
+#        cursor.execute(sql)
+#        result = cursor.fetchall()
+#        for i in result:
+#            # to_list.append(str(i['email']))
+#            # print("ip----%s" % i['ip'])
+#            # print("port----%d" % i['port'])
+#            # print("type----%s" % i['type'])
+#            # print("location----%s" % i['location'])
+#            # print("verify_time----%s" % i['verify_time'])
+#            # print(i['type'].lower()+"://" + i['ip'] + ":" + str(i['port']))
+#            PROXIES.append(i['type'].lower()+"://" + i['ip'] + ":" + str(i['port']))
+#except:
+#    print("获取数据出现异常")
+#    sys.exit(0)
+#    os._exit(0)
 import random
 class MyCustomDownloaderMiddleware(object):
     #@classmethod
@@ -20,9 +42,19 @@ class MyCustomDownloaderMiddleware(object):
         #proxy = "http://220.184.33.129:9000"
         #proxy = "https://218.72.111.103:18118"
         proxy = random.choice(PROXIES)
+        #current_ip = proxy
+        #在这里处理，异常消费的问题
         print("本次请求%s的代理 ip 地址为%s" % (request,proxy))
         request.meta['proxy'] = proxy
-
+        #request.meta['max_retry_times'] = 1
+    def process_exception(self, request, exception, spider):
+        print("**捕获到异常**")
+        print(str(exception))
+        #把当前 ip写入到黑名单中去。。
+        #with io.open('black_list.txt','a+',encoding='utf8') as f:
+        #    f.write(current_ip + '\n')
+        #    f.flush()
+        print("**捕获到异常**")
 
 
 

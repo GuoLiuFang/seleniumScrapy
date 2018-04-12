@@ -54,10 +54,8 @@ class CompanyInfoSpider(scrapy.Spider):
         elem.send_keys(Keys.RETURN)
         try:
             WebDriverWait(driver, 10).until(EC.title_contains(tag))
-        except Exception:
+        except:
             print("页面没有加载完成，超时了")
-        finally:
-            print("页面等待 finally")
         url = driver.current_url
         print('动态生成的网页 URL 是%s' % url)
         driver.close()
