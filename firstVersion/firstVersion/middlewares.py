@@ -11,8 +11,7 @@ from scrapy import signals
 #import io
 #import sys
 #connection = pymysql.connect(host='localhost',port=13306,user='webuser',password='123.c0m',db='lk',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
-PROXIES = []
-counter = 10
+#PROXIES = []
 #current_ip = ''
 #try:
 #    with connection.cursor() as cursor:
@@ -35,10 +34,13 @@ counter = 10
 import random
 from urllib.request import urlopen
 import json
+import base64
 api_url = "http://dps.kuaidaili.com/api/getdps/?orderid=942351144815561&num=100&ut=1&format=json&sep=2"
 class MyCustomDownloaderMiddleware(object):
     #@classmethod
     #def from_crawler(cls, crawler):
+    counter = 10
+    PROXIES = []
 
     # 在这里完成代理的事情。。每一个 request 重新非一个代理。。
     def process_request(self, request, spider):
@@ -46,19 +48,25 @@ class MyCustomDownloaderMiddleware(object):
         #proxy = "http://220.184.33.129:9000"
         #proxy = "https://218.72.111.103:18118"
         #在这里添加获取 代理 ip 的代码
-        if counter % 10 == 0:
-            PROXIES = []
-            counter = 1
+        if self.counter % 10 == 0:
+            self.PROXIES = []
+            self.counter = 1
             binaryjsonobj = urlopen(api_url).read()
             textjsonobj = json.loads(binaryjsonobj.decode('utf-8'))
-            PROXIES = textjsonobj['data']['proxy_list']
+            self.PROXIES = textjsonobj['data']['proxy_list']
+            print("每10次换一次 发送一个 ip 更新请求")
         else:
-            counter = counter + 1
-        proxy = "http://" + random.choice(PROXIES)
+            self.counter = self.counter + 1
+        proxy = "http://" + random.choice(self.PROXIES)
         #current_ip = proxy
         #在这里处理，异常消费的问题
         print("本次请求%s的代理 ip 地址为%s" % (request,proxy))
         request.meta['proxy'] = proxy
+        #测试下，有账户密码怎么进行的问题
+        proxy_user_pass = "2453454795:bbldoui1"
+        #encoded_user_pass = base64.encodestring(proxy_user_pass)
+        encoded_user_pass = base64.b64encode(proxy_user_pass.encode("utf-8"))
+        request.headers['Proxy-Authorization'] = 'Basic ' + encoded_user_pass.decode("utf-8")
         #request.meta['max_retry_times'] = 1
     def process_exception(self, request, exception, spider):
         print("**捕获到异常**")
