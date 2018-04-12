@@ -12,6 +12,7 @@ from scrapy import signals
 #import sys
 #connection = pymysql.connect(host='localhost',port=13306,user='webuser',password='123.c0m',db='lk',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
 PROXIES = []
+counter = 10
 #current_ip = ''
 #try:
 #    with connection.cursor() as cursor:
@@ -32,6 +33,9 @@ PROXIES = []
 #    sys.exit(0)
 #    os._exit(0)
 import random
+from urllib.request import urlopen
+import json
+api_url = "http://dps.kuaidaili.com/api/getdps/?orderid=942351144815561&num=100&ut=1&format=json&sep=2"
 class MyCustomDownloaderMiddleware(object):
     #@classmethod
     #def from_crawler(cls, crawler):
@@ -41,7 +45,16 @@ class MyCustomDownloaderMiddleware(object):
         #通过setting获取 MySQL，因为 setting 只被执行一次。。
         #proxy = "http://220.184.33.129:9000"
         #proxy = "https://218.72.111.103:18118"
-        proxy = random.choice(PROXIES)
+        #在这里添加获取 代理 ip 的代码
+        if counter % 10 == 0:
+            PROXIES = []
+            counter = 1
+            binaryjsonobj = urlopen(api_url).read()
+            textjsonobj = json.loads(binaryjsonobj.decode('utf-8'))
+            PROXIES = textjsonobj['data']['proxy_list']
+        else:
+            counter = counter + 1
+        proxy = "http://" + random.choice(PROXIES)
         #current_ip = proxy
         #在这里处理，异常消费的问题
         print("本次请求%s的代理 ip 地址为%s" % (request,proxy))
