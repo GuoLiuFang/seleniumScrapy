@@ -7,10 +7,10 @@ for major in '安装' '装饰' '市政' '材料管理' '园林' '下料' '土建
 		#statements
 		echo "前网址程序----${major}-----${city}"
                 rm -rf currentJobDir;mkdir currentJobDir
-		scrapy crawl scrape51job -atag="${major}" -aplace="${city}" -s JOBDIR=currentJobDir
+		scrapy crawl scrape51job -atag="${major}" -aplace="${city}" -s JOBDIR="`pwd`/currentJobDir"
 		echo "后网址程序----${major}-----${city}"
 		#scrapy crawl scrape51jobDetails -atag="${major}" -aplace="${city}" -o "job51-${major}-${city}".jl
-		#cat "job51-${major}-${city}".jl >> result.jl
+		cat "job51-${major}-${city}".jl >> result.jl
 	done
 done
 date +"%F %T"
