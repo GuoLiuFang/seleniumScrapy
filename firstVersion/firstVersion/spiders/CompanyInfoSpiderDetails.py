@@ -1,3 +1,4 @@
+import io
 import sys
 import re
 import os
@@ -9,6 +10,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import scrapy
+#增加在 Windows 下输出信息中文乱码问题
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 class CompanyInfoSpiderDetails(scrapy.Spider):
     name = "scrape51jobDetails"
     def start_requests(self):
