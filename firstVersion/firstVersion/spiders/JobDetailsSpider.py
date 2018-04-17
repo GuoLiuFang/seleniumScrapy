@@ -37,7 +37,7 @@ class JobDetailsSpider(scrapy.Spider):
         dict_cur.execute("select id, url from batch.company_info_details where id >= %s and id <= %s" % (startid, stopid))
         resultall = dict_cur.fetchall()
         for url in resultall:
-            yield scrapy.Request(url['url'], callback=self.parse, meta={'CompanyID':url['id'], 'CompanyURL':url['url']})
+            yield scrapy.Request(url['url'].replace("%0A",""), callback=self.parse, meta={'CompanyID':url['id'], 'CompanyURL':url['url'].replace("%0A","")})
 
     def parse(self, response):
         CompanyID = response.meta['CompanyID']
@@ -56,6 +56,13 @@ class JobDetailsSpider(scrapy.Spider):
 	        'zw_salary':x.css("span.t4::text").extract_first(),
 	        'zw_delivery_time':x.css("span.t5::text").extract_first(),
             }
-        while self.page <= 10:
+        print("-----response.url----%s" % response.url)
+        hidTotal = response.css("div#cpbotton.p_in ul input#hidTotal::attr(value)").extract_first()
+        commit_url = "https:" + response.css("div#cpbotton.p_in ul input#hidAjax::attr(value)").extract_first()
+        print("---------commit-url--------%s" % commit_url)
+        maxpage = int(int(hidTotal) / 20) + 1
+        print("maxpage---%d" % maxpage)
+        while self.page < maxpage:
             self.page = self.page + 1
-            yield scrapy.FormRequest(url = CompanyURL,formdata = {'pageno':str(self.page)},  callback=self.parse, meta={'CompanyID':CompanyID, 'CompanyURL':CompanyURL})
+            print("------pageno------%d" % self.page)
+            yield scrapy.FormRequest(url = commit_url, formdata = {'hidTotal':hidTotal, 'pageno':str(self.page),},  callback=self.parse, meta={'CompanyID':CompanyID, 'CompanyURL':CompanyURL})

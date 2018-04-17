@@ -13,6 +13,7 @@ import scrapy
 #sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 import psycopg2
 import psycopg2.extras
+import re
 class ZwDetailsSpider(scrapy.Spider):
     name = "zwDetails"
     def start_requests(self):
@@ -33,17 +34,17 @@ class ZwDetailsSpider(scrapy.Spider):
             os._exit(0)
         connection = psycopg2.connect(database="io", user="mdw", host=hostarg, port="5432", password="3edc$REW")
         dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        dict_cur.execute("select id, zw_url from batch.company_zw_details where id >= %d and id <= %d" % (startid, stopid))
+        dict_cur.execute("select id, zw_url from batch.company_zw_details where id >= %s and id <= %s" % (startid, stopid))
         resultall = dict_cur.fetchall()
         for url in resultall:
-            yield scrapy.Request(url['url'], callback=self.parse, meta={'JobID':url['id'], 'JobURL':rul['zw_url']})
+            yield scrapy.Request(url['zw_url'], callback=self.parse, meta={'JobID':url['id'], 'JobURL':url['zw_url']})
 
     def parse(self, response):
         JobID = response.meta['JobID']
         JobURL = response.meta['JobURL']
-        print('当前是第%d 页' % self.page)
-        print('当前id是%d' % id)
-        print('爬取的网页 URL 是%s' % JobURL)
+        #print('当前是第%d 页' % self.page)
+        #print('当前id是%d' % id)
+        #print('爬取的网页 URL 是%s' % JobURL)
         #zw_feature职位特色
         #zw_description职位描述
         zw_description = []
@@ -55,7 +56,6 @@ class ZwDetailsSpider(scrapy.Spider):
 	    'JobURL':JobURL,
             'zw_feature':re.sub('[\r\n \t]+','','|'.join(str(e) for e in response.css('div.jtag.inbox div.t1 span::text').extract()).replace(u'\xa0','').replace('"','”') if response.css('div.jtag.inbox div.t1 span::text').extract() is not None else ''),
 	    'zw_welfare':re.sub('[\r\n \t]+','','|'.join(str(e) for e in response.css('div.jtag.inbox p.t2 span::text').extract()).replace(u'\xa0','').replace('"','”') if response.css('div.jtag.inbox p.t2 span::text').extract() is not None else ''),
-	    'zw_description':'\n'.join(str(e) for e in zw_description),
+	    'zw_description':re.sub('[\r\n \t]+','','|'.join(str(e) for e in zw_description)).replace(u'\xa0','').replace('"','”'),
 	    'zw_location':re.sub('[\r\n \t]+','',''.join(str(e) for e in response.css('div.bmsg.inbox p.fp::text').extract()).replace(u'\xa0','').replace('"','”') if response.css('div.bmsg.inbox p.fp::text').extract() is not None else ''),
-	    'zw_location':x.css("span.t3::text").extract_first(),
         }

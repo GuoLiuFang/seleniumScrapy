@@ -5,3 +5,4 @@ echo "职位详情开始执行"
 		cat "job51-${1}-${2}".jl >> result.jl
 date +"%F %T"
 echo "职位详情执行结束"
+#scrapy crawl zwDetails -astartid=1 -astopid=100 -ahost="localhost" -ozwresultx.jl
