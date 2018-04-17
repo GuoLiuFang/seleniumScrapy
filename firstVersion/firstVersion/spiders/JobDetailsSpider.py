@@ -1,3 +1,4 @@
+import json
 import io
 import sys
 import os
@@ -38,13 +39,9 @@ class JobDetailsSpider(scrapy.Spider):
         resultall = dict_cur.fetchall()
         for url in resultall:
             yield scrapy.Request(url['url'].replace("%0A",""), callback=self.parse, meta={'CompanyID':url['id'], 'CompanyURL':url['url'].replace("%0A","")})
-
     def parse(self, response):
         CompanyID = response.meta['CompanyID']
         CompanyURL = response.meta['CompanyURL']
-        #print('当前是第%d 页' % self.page)
-        #print('当前id是%d' % id)
-        #print('爬取的网页 URL 是%s' % CompanyURL)
         for x in response.css("div#joblistdata.dw_table div.el"):
             yield {
   	        'CompanyID':CompanyID,
@@ -56,13 +53,10 @@ class JobDetailsSpider(scrapy.Spider):
 	        'zw_salary':x.css("span.t4::text").extract_first(),
 	        'zw_delivery_time':x.css("span.t5::text").extract_first(),
             }
-        print("-----response.url----%s" % response.url)
         hidTotal = response.css("div#cpbotton.p_in ul input#hidTotal::attr(value)").extract_first()
-        commit_url = "https:" + response.css("div#cpbotton.p_in ul input#hidAjax::attr(value)").extract_first()
-        print("---------commit-url--------%s" % commit_url)
         maxpage = int(int(hidTotal) / 20) + 1
-        print("maxpage---%d" % maxpage)
+        commit_url = "https:" + response.css("div#cpbotton.p_in ul input#hidAjax::attr(value)").extract_first()
         while self.page < maxpage:
             self.page = self.page + 1
-            print("------pageno------%d" % self.page)
-            yield scrapy.FormRequest(url = commit_url, formdata = {'hidTotal':hidTotal, 'pageno':str(self.page),},  callback=self.parse, meta={'CompanyID':CompanyID, 'CompanyURL':CompanyURL})
+            formdata={'hidTotal':hidTotal, 'pageno':str(self.page),}
+            yield scrapy.Request(url = commit_url, method = 'POST', body = json.dumps(formdata), headers = {'Content-Type':'application/json'},  callback=self.parse, meta={'CompanyID':CompanyID, 'CompanyURL':CompanyURL})
