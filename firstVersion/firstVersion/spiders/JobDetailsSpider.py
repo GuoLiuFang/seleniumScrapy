@@ -54,7 +54,9 @@ class JobDetailsSpider(scrapy.Spider):
 	        'zw_delivery_time':x.css("span.t5::text").extract_first(),
             }
         hidTotal = response.css("div#cpbotton.p_in ul input#hidTotal::attr(value)").extract_first()
-        maxpage = int(int(hidTotal) / 20) + 1
+        maxpage = 1
+        if hidTotal is not None: 
+            maxpage = int(int(hidTotal) / 20) + 1
         commit_url = "https:" + response.css("div#cpbotton.p_in ul input#hidAjax::attr(value)").extract_first()
         while self.page < maxpage:
             self.page = self.page + 1
