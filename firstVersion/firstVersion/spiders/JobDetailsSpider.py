@@ -57,7 +57,7 @@ class JobDetailsSpider(scrapy.Spider):
         maxpage = 1
         if hidTotal is not None: 
             maxpage = int(int(hidTotal) / 20) + 1
-        commit_url = "https:" + response.css("div#cpbotton.p_in ul input#hidAjax::attr(value)").extract_first()
+            commit_url = "https:" + response.css("div#cpbotton.p_in ul input#hidAjax::attr(value)").extract_first()
         while self.page < maxpage:
             self.page = self.page + 1
             formdata={'hidTotal':hidTotal, 'pageno':str(self.page),}
