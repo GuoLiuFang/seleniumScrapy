@@ -20,8 +20,10 @@ class CompanyInfoSpider(scrapy.Spider):
         #组合出来所有可能的 URL 抛出来
         for majorkey , majorvalue in CompanyCity.buildhr_major.items():
             for placekey, placevalue in CompanyCity.buildhr_citys.items():
-                url = "http://www.buildhr.com/so/11-" + majorvalue + "-" + placevalue + ".html" 
-                yield scrapy.Request(url, self.parse, meta={'majorkey':majorkey, 'placekey':placekey, 'current':1, 'maxpage':1})
+                filename = 'buildhr-%s-%s.log' % (CompanyCity.buildhr_major[majorkey], CompanyCity.buildhr_citys[placekey])
+                with io.open(filename, 'r', encoding='utf8') as f:
+                    for url in f:
+                        yield scrapy.Request(url, self.parse, meta={'majorkey':majorkey, 'placekey':placekey, 'current':1, 'maxpage':1})
     def parse(self, response):
         majorkey = response.meta['majorkey']
         placekey = response.meta['placekey']
@@ -32,8 +34,6 @@ class CompanyInfoSpider(scrapy.Spider):
         with io.open(filename, 'a+', encoding='utf8') as f:
             for i in response.css("html body div.wrapper div.search_list div.list_middle table tr td.td_sp2 a::attr(href)").extract():
                 page = "http://www.buildhr.com" + i
-                if "vip.buildhr.com" in i:
-                    page = i
                 f.write(page + '\n')
         #先把当前页处理完成，再去解决下一页的问题
         maxpageurl = response.css("html body div.wrapper div.search_list div.list_bt div.common_bg2 a.a_icon05::attr(href)").extract_first()
