@@ -14,7 +14,7 @@ import scrapy
 #增加在 Windows 下输出信息中文乱码问题
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 class CompanyInfoSpider(scrapy.Spider):
-    name = "scrapebuildhr"
+    name = "scrapebuildhrCompany"
     def start_requests(self):
         #组合出来所有可能的 URL 抛出来
         for majorkey , majorvalue in CompanyCity.buildhr_major.items():
@@ -25,7 +25,7 @@ class CompanyInfoSpider(scrapy.Spider):
                         if "vip.buildhr.com" in url:
                             logging.warning("这是 VIP 的网页，暂时先不解析--url---%s----" % url)
                         else:
-                            yield scrapy.Request(url, self.parse, meta={'majorkey':majorkey, 'placekey':placekey, })
+                            yield scrapy.Request(url.replace("%0A",""), self.parse, meta={'majorkey':majorkey, 'placekey':placekey, })
     def parse(self, response):
         majorkey = response.meta['majorkey']
         placekey = response.meta['placekey']
@@ -49,6 +49,7 @@ class CompanyInfoSpider(scrapy.Spider):
         yield {
             "major":majorkey,
             "whichplace":placekey,
+            "url":response.url.replace("%0A",""),
             "companyname":response.css("div.wrap_lt.com_info div.c_lf h1.h2_sp.bt::text").extract_first(),
             "companyselfinfo":re.sub('[\r\n \t]+','',''.join(companyselfinfo).replace("\u3000","").replace(u'\xa0','').replace('"','”')).replace('：',''),
             "company_property":re.sub('[\r\n \t]+','',''.join(company_property).replace("\u3000","").replace(u'\xa0','').replace('"','”')).replace('：',''),

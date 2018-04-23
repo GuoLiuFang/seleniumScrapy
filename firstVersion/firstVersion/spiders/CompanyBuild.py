@@ -32,8 +32,8 @@ class CompanyInfoSpider(scrapy.Spider):
         with io.open(filename, 'a+', encoding='utf8') as f:
             for i in response.css("html body div.wrapper div.search_list div.list_middle table tr td.td_sp2 a::attr(href)").extract():
                 page = "http://www.buildhr.com" + i
-                if "vip.buildhr.com" in i:
-                    page = i
+                if "vip.buildhr.com" in i or "top.buildhr.com" in i:
+                    page = i.replace("http","").replace(":","").replace("//","")
                 f.write(page + '\n')
         #先把当前页处理完成，再去解决下一页的问题
         maxpageurl = response.css("html body div.wrapper div.search_list div.list_bt div.common_bg2 a.a_icon05::attr(href)").extract_first()
