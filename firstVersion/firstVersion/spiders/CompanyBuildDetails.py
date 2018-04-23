@@ -15,7 +15,6 @@ import scrapy
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 class CompanyInfoSpider(scrapy.Spider):
     name = "scrapebuildhr"
-    pagemax = "p(?P<maxpage>\d+).html"
     def start_requests(self):
         #组合出来所有可能的 URL 抛出来
         for majorkey , majorvalue in CompanyCity.buildhr_major.items():
@@ -23,25 +22,36 @@ class CompanyInfoSpider(scrapy.Spider):
                 filename = 'buildhr-%s-%s.log' % (CompanyCity.buildhr_major[majorkey], CompanyCity.buildhr_citys[placekey])
                 with io.open(filename, 'r', encoding='utf8') as f:
                     for url in f:
-                        yield scrapy.Request(url, self.parse, meta={'majorkey':majorkey, 'placekey':placekey, 'current':1, 'maxpage':1})
+                        if "vip.buildhr.com" in url:
+                            logging.warning("这是 VIP 的网页，暂时先不解析--url---%s----" % url)
+                        else:
+                            yield scrapy.Request(url, self.parse, meta={'majorkey':majorkey, 'placekey':placekey, })
     def parse(self, response):
         majorkey = response.meta['majorkey']
         placekey = response.meta['placekey']
-        current = response.meta['current']
-        maxpage = response.meta['maxpage']
-        logging.log(logging.WARNING,"--------url-----%s------current---%d-------maxpage----%d--------majorkey---%s------placekey------%s------" % (response.url,current,maxpage,majorkey,placekey))
-        filename = 'buildhr-%s-%s.log' % (CompanyCity.buildhr_major[majorkey], CompanyCity.buildhr_citys[placekey])
-        with io.open(filename, 'a+', encoding='utf8') as f:
-            for i in response.css("html body div.wrapper div.search_list div.list_middle table tr td.td_sp2 a::attr(href)").extract():
-                page = "http://www.buildhr.com" + i
-                f.write(page + '\n')
-        #先把当前页处理完成，再去解决下一页的问题
-        maxpageurl = response.css("html body div.wrapper div.search_list div.list_bt div.common_bg2 a.a_icon05::attr(href)").extract_first()
-        if maxpageurl is not None:
-            matchresult = re.search(self.pagemax, maxpageurl)
-            maxpage = int(matchresult.group("maxpage"))
-        if current < maxpage:
-            current = current + 1
-            url = "http://www.buildhr.com/so/11-" + CompanyCity.buildhr_major[majorkey] + "-" + CompanyCity.buildhr_citys[placekey] + "-sm3-p" + str(current) + ".html"
-            logging.log(logging.WARNING, "--------url-----%s------current---%d-------maxpage----%d" % (url,current,maxpage))
-            yield scrapy.Request(url, self.parse, meta={'majorkey':majorkey, 'placekey':placekey, 'current':current, 'maxpage':maxpage})
+        #公司简介拿下：
+        companyselfinfo = response.css("html body div.wrapper div.wrap_lt.wrap_no div.wrap_lt.com_info div.company_contact.company_contact_mb.u_whsn p font::text").extract()
+        if len(companyselfinfo) == 0:
+            companyselfinfo = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.company_contact.company_contact_mb.u_whsn p::text").extract()
+        #公司属性拿下
+        a = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.c_lf ul.company_info li span::text").extract()
+        b = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.c_lf ul.company_info li::text").extract()
+        m = dict(zip(a,b))
+        company_property = str(m)
+        b = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.company_contact.company_contact_mb ul li::text").extract()
+        a = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.company_contact.company_contact_mb ul li strong::text").extract()
+        m = dict(zip(a,b))
+        company_contact = str(m)
+        a = response.css("div.company_contact.company_contact_mb.company_beian ul.clearfix li span.title::text").extract()
+        b = response.css("div.company_contact.company_contact_mb.company_beian ul.clearfix li span.value::text").extract()
+        m = dict(zip(a,b))
+        company_credit = str(m)
+        yield {
+            "major":majorkey,
+            "whichplace":placekey,
+            "companyname":response.css("div.wrap_lt.com_info div.c_lf h1.h2_sp.bt::text").extract_first(),
+            "companyselfinfo":re.sub('[\r\n \t]+','',''.join(companyselfinfo).replace("\u3000","").replace(u'\xa0','').replace('"','”')).replace('：',''),
+            "company_property":re.sub('[\r\n \t]+','',''.join(company_property).replace("\u3000","").replace(u'\xa0','').replace('"','”')).replace('：',''),
+            "company_contact":re.sub('[\r\n \t]+','',''.join(company_contact).replace("\u3000","").replace(u'\xa0','').replace('"','”')).replace('：',''),
+            "company_credit":re.sub('[\r\n \t]+','',''.join(company_credit).replace("\u3000","").replace(u'\xa0','').replace('"','”')).replace('：',''),
+        }
