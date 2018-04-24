@@ -24,8 +24,11 @@ class CompanyInfoSpider(scrapy.Spider):
                     for url in f:
                         if "vip.buildhr.com" in url:
                             logging.warning("这是 VIP 的网页，暂时先不解析--url---%s----" % url)
-                        else:
-                            yield scrapy.Request(url.replace("%0A",""), self.parse, meta={'majorkey':majorkey, 'placekey':placekey, })
+                        else if "top.buildhr.com" in url:
+                            url = "http://" + url
+                            else:
+                                pass
+                        yield scrapy.Request(url.replace("%0A",""), self.parse, meta={'majorkey':majorkey, 'placekey':placekey, })
     def parse(self, response):
         majorkey = response.meta['majorkey']
         placekey = response.meta['placekey']
