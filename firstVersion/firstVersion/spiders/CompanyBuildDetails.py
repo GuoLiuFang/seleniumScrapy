@@ -1,4 +1,5 @@
 import logging
+import json
 import re
 import io
 import sys
@@ -41,15 +42,15 @@ class CompanyInfoSpider(scrapy.Spider):
         a = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.c_lf ul.company_info li span::text").extract()
         b = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.c_lf ul.company_info li::text").extract()
         m = dict(zip(a,b))
-        company_property = str(m)
+        company_property = json.dumps(m, ensure_ascii=False)
         b = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.company_contact.company_contact_mb ul li::text").extract()
         a = response.css("div.wrap_lt.wrap_no div.wrap_lt.com_info div.company_contact.company_contact_mb ul li strong::text").extract()
         m = dict(zip(a,b))
-        company_contact = str(m)
+        company_contact = json.dumps(m, ensure_ascii=False)
         a = response.css("div.company_contact.company_contact_mb.company_beian ul.clearfix li span.title::text").extract()
         b = response.css("div.company_contact.company_contact_mb.company_beian ul.clearfix li span.value::text").extract()
         m = dict(zip(a,b))
-        company_credit = str(m)
+        company_credit = json.dumps(m, ensure_ascii=False)
         yield {
             "major":majorkey,
             "whichplace":placekey,
